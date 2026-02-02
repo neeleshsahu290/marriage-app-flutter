@@ -1,0 +1,89 @@
+import 'package:flutter/material.dart';
+import 'package:swan_match/core/di/service_locator.dart';
+// ignore: depend_on_referenced_packages
+import 'package:swan_match/core/router/app_router.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/utils.dart';
+import 'package:swan_match/features/setup/cubit/startup_cubit.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await setupDI(); // GetIt
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => getIt<StartupCubit>()),
+        // BlocProvider(
+        //   create: (_) => getIt<AuthCubit>(),
+        // ),
+      ],
+      child: const MarriageApp(),
+    ),
+  );
+}
+
+// class App extends ConsumerWidget {
+//   const App({super.key});
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     return ResponsiveSizer(
+//       builder: (context, orientation, screenType) {
+//         final router = ref.watch(goRouterProvider);
+
+//         return MaterialApp.router(
+//           debugShowCheckedModeBanner: false,
+//           routerConfig: router,
+//         );
+//       },
+//     );
+//   }
+// }
+
+class MarriageApp extends StatelessWidget {
+  const MarriageApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveSizer(
+      builder: (context, orientation, screenType) {
+        // final router = AppRouter.createRouter(
+        //   startupCubit: context.read<StartupState>(),
+        //   // authCubit: context.read<AuthCubit>(),
+        // );
+
+        return MaterialApp.router(
+          scaffoldMessengerKey: snackbarKey,
+          title: 'Marriage App',
+          debugShowCheckedModeBanner: false,
+          routerConfig: router,
+          theme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.light,
+
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.primary,
+              brightness: Brightness.light,
+            ),
+
+            scaffoldBackgroundColor: AppColors.background,
+
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              elevation: 0,
+            ),
+
+            textTheme: const TextTheme(
+              bodyMedium: TextStyle(color: Colors.black),
+              bodySmall: TextStyle(color: Colors.black54),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
