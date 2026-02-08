@@ -57,7 +57,15 @@ dependencies:
   tuple: ^2.0.2
   path: ^1.9.1
   equatable: ^2.0.8
+  
+  supabase_flutter: ^2.12.0
+  path_provider: ^2.1.5
+  flutter_image_compress: ^2.4.0
+  restart: ^1.0.0+1
+  flutter_localizations:
+    sdk: flutter
   intl: ^0.20.2
+  flutter_gen: ^5.12.0
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +89,7 @@ flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
+  generate: true
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:

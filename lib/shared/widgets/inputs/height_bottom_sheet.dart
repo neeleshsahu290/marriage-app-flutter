@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/shared/widgets/buttons/primarybutton.dart';
-import 'package:swan_match/shared/widgets/inputs/primary_text_feild.dart';
 import 'package:swan_match/shared/widgets/my_text.dart';
 
 class HeightBottomSheetField extends StatefulWidget {
@@ -71,7 +71,7 @@ class _HeightBottomSheetFieldState extends State<HeightBottomSheetField> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    MyText(text: "Height"),
+                    MyText(text: context.tr.height),
                     IconButton(
                       onPressed: () {
                         Navigator.pop(context);
@@ -144,7 +144,7 @@ class _HeightBottomSheetFieldState extends State<HeightBottomSheetField> {
               ),
               PrimaryButton(
                 height: 50,
-                btnText: 'Save',
+                btnText: context.tr.saveChanges,
                 cornerRadius: 30,
                 onPressed: () {
                   setState(() {
@@ -187,7 +187,7 @@ class _HeightBottomSheetFieldState extends State<HeightBottomSheetField> {
               children: [
                 Expanded(
                   child: MyText(
-                    text: _selectedHeight ?? "Select height",
+                    text: _selectedHeight ?? context.tr.selectHeight,
                     color: _selectedHeight == null
                         ? AppColors.textSecondary
                         : AppColors.textPrimary,

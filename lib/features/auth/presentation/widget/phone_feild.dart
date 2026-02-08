@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/core/utils/validator_utils.dart';
 import 'package:swan_match/shared/widgets/inputs/primary_text_feild.dart';
 import 'package:swan_match/shared/widgets/my_text.dart';
@@ -44,14 +45,14 @@ class PhoneField extends StatelessWidget {
             radius: 12,
             controller: controller,
             inputType: TextInputType.phone,
-            hintText: 'Enter phone number',
+            hintText: context.tr.enterPhoneNumber,
             onChanged: onChanged,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return "Phone number is required";
+                return context.tr.errorPhoneRequired;
               }
               if (!ValidatorUtils.isValidPhone(value)) {
-                return "Enter a valid  mobile number";
+                return context.tr.errorPhoneInvalid;
               }
               return null;
             },

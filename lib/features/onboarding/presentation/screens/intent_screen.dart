@@ -4,18 +4,26 @@ import 'package:flutter_svg/svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/constants/asset_constants.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/features/setup/cubit/startup_cubit.dart';
 import 'package:swan_match/shared/widgets/buttons/primarybutton.dart';
 import 'package:swan_match/shared/widgets/common/header_widget_with_icon.dart';
 import 'package:swan_match/shared/widgets/my_text.dart';
 
-final List list = ["Within 6 Months", "6-12 Months", " 1-2 Years", " 2+ Years"];
-final List<String> rulesList = [
-  'Respectful communication only',
-  'No inappropriate content',
-  'Honest and accurate profiles',
-  'Report suspicious behavior',
+final List list = [
+  "WITHIN_6_MONTHS",
+  "SIX_TO_TWELVE_MONTHS",
+  "ONE_TO_TWO_YEARS",
+  "TWO_PLUS_YEARS",
 ];
+List<String> getRulesList(BuildContext context) {
+  return [
+    context.tr.ruleRespect,
+    context.tr.ruleNoContent,
+    context.tr.ruleHonest,
+    context.tr.ruleReport,
+  ];
+}
 
 class IntentScreen extends StatefulWidget {
   const IntentScreen({super.key});
@@ -45,13 +53,12 @@ class _IntentScreenState extends State<IntentScreen> {
                   children: [
                     HeaderWidgetWithIcon(
                       iconName: AssetConstants.lockIcon,
-                      title: 'Serious Intent Required',
-                      descn:
-                          'This platform is for meaningful, long-term relationships only.',
+                      title: context.tr.intentTitle,
+                      descn: context.tr.intentDesc,
                     ),
 
                     MyText(
-                      text: 'Looking for something serious?',
+                      text: context.tr.intentQuestionSerious,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
                     ),
@@ -60,7 +67,7 @@ class _IntentScreenState extends State<IntentScreen> {
                     SizedBox(height: 2.h),
 
                     MyText(
-                      text: 'When are you looking to settle down?',
+                      text: context.tr.intentQuestionSettle,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
                     ),
@@ -96,7 +103,7 @@ class _IntentScreenState extends State<IntentScreen> {
                                 horizontal: 16,
                               ),
                               child: MyText(
-                                text: list[index],
+                                text: context.t(list[index]),
                                 color: isSelectd
                                     ? AppColors.textInverse
                                     : AppColors.textPrimary,
@@ -123,14 +130,15 @@ class _IntentScreenState extends State<IntentScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             MyText(
-                              text: 'Community Guidelines',
+                              text: context.tr.communityGuidelinesTitle,
                               fontSize: 17.sp,
                               fontWeight: FontWeight.w600,
                             ),
                             SizedBox(height: 8),
                             ...List.generate(
-                              rulesList.length,
-                              (index) => bulletedText(rulesList[index]),
+                              getRulesList(context).length,
+                              (index) =>
+                                  bulletedText(getRulesList(context)[index]),
                             ),
                           ],
                         ),
@@ -174,8 +182,7 @@ class _IntentScreenState extends State<IntentScreen> {
                           child: MyText(
                             fontWeight: FontWeight.w600,
                             fontSize: 15.sp,
-                            text:
-                                'I accept the community guidelines and agree to use this platform for marriage purpose only',
+                            text: context.tr.intentAcceptText,
                           ),
                         ),
                       ],
@@ -187,7 +194,7 @@ class _IntentScreenState extends State<IntentScreen> {
 
             PrimaryButton(
               isDisabled: !isAcceptIntent || selected < 0,
-              btnText: 'Continue',
+              btnText: context.tr.continueText,
               onPressed: () {
                 context.read<StartupCubit>().setIntentDone(list[selected]);
               },
@@ -221,7 +228,7 @@ class _IntentScreenState extends State<IntentScreen> {
             SizedBox(width: 4),
             Expanded(
               child: MyText(
-                text: 'Yes, I am serious about relationship',
+                text: context.tr.intentSeriousBox,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),

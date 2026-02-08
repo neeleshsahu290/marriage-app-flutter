@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/constants/asset_constants.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/features/auth/cubit/auth_cubit.dart';
 import 'package:swan_match/features/auth/cubit/ui_cubit.dart';
 import 'package:swan_match/features/auth/cubit/ui_state.dart';
@@ -55,8 +56,8 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                   children: [
                     HeaderWidgetWithIcon(
                       iconName: AssetConstants.mailIcon,
-                      title: "Create Your Password ",
-                      descn: "Pick a strong password you’ll remember.",
+                      title: context.tr.createPasswordTitle,
+                      descn: context.tr.createPasswordDesc,
                     ),
 
                     Form(
@@ -65,8 +66,8 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                         children: [
                           PrimaryTextField(
                             controller: _password,
-                            label: 'Password',
-                            hintText: 'Enter Password',
+                            label: context.tr.password,
+                            hintText: context.tr.enterPassword,
                             onChanged: (str) {
                               context.read<UiCubit>().setDisabled(
                                 _formKey.currentState!.validate(),
@@ -76,11 +77,11 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                             prrefixIcon: AssetConstants.mailDarkIcon,
                             validator: (str) {
                               if (str == null || str.trim().isEmpty) {
-                                return "Password is required";
+                                return context.tr.errorPasswordRequired;
                               }
 
                               if (str.length < 6) {
-                                return "Password must be at least 6 characters";
+                                return context.tr.errorPasswordLength;
                               }
 
                               // if (!RegExp(r'[A-Z]').hasMatch(str)) {
@@ -101,8 +102,8 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
 
                           PrimaryTextField(
                             controller: _rePassword,
-                            label: 'Confirm Password',
-                            hintText: 'Enter Password',
+                            label: context.tr.confirmPasswordLabel,
+                            hintText: context.tr.enterPassword,
                             onChanged: (str) {
                               context.read<UiCubit>().setDisabled(
                                 _formKey.currentState!.validate(),
@@ -112,11 +113,11 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                             prrefixIcon: AssetConstants.mailDarkIcon,
                             validator: (str) {
                               if (str == null || str.trim().isEmpty) {
-                                return "Confirm password is required";
+                                return context.tr.errorConfirmPasswordRequired;
                               }
 
                               if (str != _password.text) {
-                                return "Passwords do not match";
+                                return context.tr.errorPasswordMismatch;
                               }
 
                               return null;
@@ -135,18 +136,17 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
               return PrimaryButton(
                 isLoading: state.isLoading,
                 isDisabled: !state.isDisabled,
-                btnText: 'Continue',
+                btnText: context.tr.continueText,
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     context.read<UiCubit>().setLoading(true);
-                    bool success = await context.read<AuthCubit>().createUser(password: 
-                      _password.text,
+                    bool success = await context.read<AuthCubit>().createUser(
+                      password: _password.text,
                     );
                     context.read<UiCubit>().setLoading(false);
 
                     if (success) {
                       context.read<StartupCubit>().loginComplete();
-
                     }
                   }
                 },

@@ -7,6 +7,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/constants/asset_constants.dart';
 import 'package:swan_match/core/router/route_names.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/core/utils/validator_utils.dart';
 import 'package:swan_match/features/auth/cubit/auth_cubit.dart';
 import 'package:swan_match/features/auth/cubit/ui_cubit.dart';
@@ -54,16 +55,16 @@ class _EmailScreenState extends State<EmailScreen> {
                   children: [
                     HeaderWidgetWithIcon(
                       iconName: AssetConstants.mailIcon,
-                      title: "Email Verification",
-                      descn: "We'll send you a code to verify your email",
+                      title: context.tr.emailVerificationTitle,
+                      descn: context.tr.emailVerificationDesc,
                     ),
 
                     Form(
                       key: _formKey,
                       child: PrimaryTextField(
                         controller: _controller,
-                        label: 'Email',
-                        hintText: 'Enter Email',
+                        label: context.tr.emailLabel,
+                        hintText: context.tr.enterEmail,
                         onChanged: (str) {
                           context.read<UiCubit>().setDisabled(
                             _formKey.currentState!.validate(),
@@ -73,9 +74,9 @@ class _EmailScreenState extends State<EmailScreen> {
                         prrefixIcon: AssetConstants.mailDarkIcon,
                         validator: (str) {
                           if (str == null || str.trim().isEmpty) {
-                            return "Email is required";
+                            return context.tr.errorEmailRequired;
                           } else if (!ValidatorUtils.isValidEmail(str.trim())) {
-                            return "Enter a valid email address";
+                            return context.tr.errorEmailInvalid;
                           }
                           return null;
                         },
@@ -91,7 +92,7 @@ class _EmailScreenState extends State<EmailScreen> {
               return PrimaryButton(
                 isLoading: state.isLoading,
                 isDisabled: !state.isDisabled,
-                btnText: 'Continue',
+                btnText: context.tr.continueText,
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     context.read<UiCubit>().setLoading(true);

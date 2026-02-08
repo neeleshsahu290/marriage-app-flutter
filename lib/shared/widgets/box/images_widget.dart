@@ -4,8 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
 
 class PhotosWidget extends StatefulWidget {
-  final List<File>? photos;
-  final ValueChanged<List<File>>? onChanged;
+  final List<dynamic>? photos; // can be File or String(url)
+  final ValueChanged<List<dynamic>>? onChanged;
 
   const PhotosWidget({
     super.key,
@@ -20,39 +20,65 @@ class PhotosWidget extends StatefulWidget {
 }
 
 class _PhotosWidgetState extends State<PhotosWidget> {
-  final List<File> photos = [];
+  final List<dynamic> photos = [];
 
   Future<void> _pickImage(BuildContext context, int index) async {
     final picker = ImagePicker();
     final XFile? picked = await picker.pickImage(source: ImageSource.gallery);
 
     if (picked == null) return;
-    photos.add(File(picked.path));
-    setState(() {});
 
-    final updated = List<File>.from(photos);
+    final file = File(picked.path);
 
-    if (index < updated.length) {
-      updated[index] = File(picked.path);
-    } else {
-      updated.add(File(picked.path));
-    }
-    widget.onChanged?.call(updated);
+    setState(() {
+      if (index < photos.length) {
+        photos[index] = file;
+      } else {
+        photos.add(file);
+      }
+    });
+
+    widget.onChanged?.call(List<dynamic>.from(photos));
   }
 
   void _removeImage(int index) {
-    final updated = List<File>.from(photos)..removeAt(index);
-    photos.removeAt(index);
-    setState(() {});
-    widget.onChanged?.call(updated);
+    setState(() {
+      photos.removeAt(index);
+    });
+
+    widget.onChanged?.call(List<dynamic>.from(photos));
   }
 
   @override
   void initState() {
+    super.initState();
     if (widget.photos != null) {
       photos.addAll(widget.photos!);
     }
-    super.initState();
+  }
+
+  Widget _buildImage(dynamic photo) {
+    if (photo is File) {
+      return Image.file(
+        photo,
+        width: double.infinity,
+        height: double.infinity,
+        fit: BoxFit.cover,
+      );
+    }
+
+    if (photo is String && photo.isNotEmpty) {
+      return Image.network(
+        photo,
+        width: double.infinity,
+        height: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) =>
+            const Icon(Icons.broken_image, color: Colors.grey),
+      );
+    }
+
+    return const SizedBox();
   }
 
   @override
@@ -83,12 +109,7 @@ class _PhotosWidgetState extends State<PhotosWidget> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          photos[index],
-                          width: double.infinity,
-                          height: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
+                        child: _buildImage(photos[index]),
                       ),
                       Positioned(
                         top: 6,

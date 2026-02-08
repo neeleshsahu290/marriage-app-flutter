@@ -1,8 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:swan_match/core/storage/app_prefs.dart';
 import 'package:swan_match/core/storage/pref_names.dart';
+import 'package:swan_match/core/storage/squlite_db_storage.dart';
 import 'package:swan_match/features/setup/cubit/startup_state.dart';
 import 'package:swan_match/features/setup/data/startup_repository.dart';
+import 'package:restart/restart.dart';
 
 class StartupCubit extends Cubit<StartupState> {
   final StartupRepository repo;
@@ -24,8 +26,8 @@ class StartupCubit extends Cubit<StartupState> {
     emit(state.copyWith(splashFinished: true));
   }
 
-  Future<void> selectLanguage(String languageCode) async {
-    await repo.setLanguageDone(languageCode: languageCode);
+  Future<void> selectLanguage() async {
+    //   await repo.setLanguageDone(languageCode: languageCode);
     emit(state.copyWith(languageSelected: true));
   }
 
@@ -41,6 +43,14 @@ class StartupCubit extends Cubit<StartupState> {
 
   Future<void> userCreated() async {
     emit(state.copyWith(isEmailOtpSent: true));
+  }
+
+  Future<void> loggedIn() async {
+    emit(state.copyWith(isLoggedIn: true));
+
+    if (repo.isOnBoardingDone()) {
+      emit(state.copyWith(isOnoarding: true));
+    }
   }
 
   Future<void> setOnboardingDone() async {
@@ -60,17 +70,19 @@ class StartupCubit extends Cubit<StartupState> {
 
   Future<void> logout() async {
     await repo.clearSession(); // clear prefs / token / flags
+    await SQLiteDbStorage.clearFullDb();
+    restart();
 
-    emit(
-      StartupState.initial(
-        splashFinished: true, // splash already done
-        languageSelected: repo.isLanguageDone(),
-        intentSelected: false,
-        welcomeSelected: false,
-        isLoggedIn: false,
-        isOnoarding: false,
-        isEmailOtpSent: false,
-      ),
-    );
+    // emit(
+    //   StartupState.initial(
+    //     splashFinished: true, // splash already done
+    //     languageSelected: repo.isLanguageDone(),
+    //     intentSelected: false,
+    //     welcomeSelected: false,
+    //     isLoggedIn: false,
+    //     isOnoarding: false,
+    //     isEmailOtpSent: false,
+    //   ),
+    // );
   }
 }

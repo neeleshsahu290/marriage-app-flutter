@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
@@ -15,10 +16,9 @@ class SettingsRepositoryImpl implements SettingsRepository {
   @override
   Future<void> updateUserSetting({required dynamic data}) async {
     try {
-      await Future.delayed(Duration(seconds: 5));
-
+      log(data.toString());
       var response = await api.put(ApiConstants.updateUserFeilds, data: data);
-
+      log(response.toString());
       final updatedFields = response.data["data"]["updated_fields"];
 
       // Store each setting
@@ -35,6 +35,29 @@ class SettingsRepositoryImpl implements SettingsRepository {
         PrefNames.photoVisibility,
         updatedFields["photo_visibility"],
       );
+    } on DioException catch (e) {
+      log(e.toString());
+      throw Exception(
+        e.response?.data["message"] ?? "Failed to update setting",
+      );
+    }
+  }
+
+  @override
+  Future<void> updatePreferences({required data}) async {
+    try {
+      log(data.toString());
+
+      var response = await api.put(ApiConstants.updatePreferences, data: data);
+      log("response");
+      log(response.data.toString());
+
+      if (response.data['data'] != null) {
+        await AppPrefs.setString(
+          PrefNames.userPreferences,
+          jsonEncode(response.data['data']),
+        );
+      }
     } on DioException catch (e) {
       log(e.toString());
       throw Exception(

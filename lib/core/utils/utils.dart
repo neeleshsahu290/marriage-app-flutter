@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
-
-final GlobalKey<ScaffoldMessengerState> snackbarKey =
-    GlobalKey<ScaffoldMessengerState>();
+import 'package:swan_match/main.dart';
 
 class Utils {
   static void showCustomSnackbar({
@@ -17,7 +15,7 @@ class Utils {
       SnackBar(
         behavior: SnackBarBehavior.floating,
         elevation: 6,
-        margin: const EdgeInsets.all(12),
+        margin: const EdgeInsets.only(bottom: 100, right: 12, left: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         backgroundColor: backgroundColor,
         duration: duration,

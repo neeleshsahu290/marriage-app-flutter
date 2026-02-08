@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/router/route_names.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/features/auth/cubit/auth_cubit.dart';
 import 'package:swan_match/features/auth/cubit/ui_cubit.dart';
 import 'package:swan_match/features/auth/cubit/ui_state.dart';
@@ -36,13 +37,13 @@ class EmailOtpScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   MyText(
-                    text: "Enter Verification Code",
+                    text: context.tr.enterVerificationCode,
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w600,
                   ),
                   SizedBox(height: 2.h),
                   MyText(
-                    text: "We'll send you a code to verify your Email",
+                    text: context.tr.emailOtpDesc,
                     color: AppColors.textSecondary,
                     textAlignment: TextAlign.center,
                   ),
@@ -58,7 +59,6 @@ class EmailOtpScreen extends StatelessWidget {
                   Form(
                     key: _formkey,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
-
                     child: PinInputFeild(
                       onChanged: (value) {
                         _otp = value;
@@ -68,10 +68,10 @@ class EmailOtpScreen extends StatelessWidget {
                       },
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'PIN is required';
+                          return context.tr.errorPinRequired;
                         }
                         if (!RegExp(r'^\d{6}$').hasMatch(value)) {
-                          return 'Enter a valid 6-digit PIN';
+                          return context.tr.errorPinInvalid;
                         }
                         return null;
                       },
@@ -89,7 +89,7 @@ class EmailOtpScreen extends StatelessWidget {
               return PrimaryButton(
                 isLoading: state.isLoading,
                 isDisabled: !state.isDisabled,
-                btnText: 'Continue',
+                btnText: context.tr.confirm,
                 onPressed: () async {
                   if (_formkey.currentState!.validate()) {
                     context.read<UiCubit>().setLoading(true);

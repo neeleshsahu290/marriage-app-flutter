@@ -1,3 +1,5 @@
+import 'package:swan_match/features/settings/presentaton/preference_screen.dart';
+
 class RouteNames {
   // inital
   static const splash = '/';
@@ -30,4 +32,5 @@ class RouteNames {
   static const matchDetails = '/match-details';
   static const settings = '/settings';
   static const editSettings = '/edit-settings';
+  static const preferenceSection = '/preference-section';
 }

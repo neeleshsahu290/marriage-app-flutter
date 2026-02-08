@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:swan_match/core/locale/locale_cubit.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/features/auth/model/language_model.dart';
 import 'package:swan_match/features/setup/cubit/startup_cubit.dart';
 import 'package:swan_match/shared/widgets/my_text.dart';
 
 class LanguageScreen extends StatefulWidget {
-  const LanguageScreen({super.key});
+  final bool isFromSettings;
+
+  const LanguageScreen({super.key, this.isFromSettings = false});
 
   @override
   State<LanguageScreen> createState() => _LanguageScreenState();
@@ -18,8 +23,9 @@ class _LanguageScreenState extends State<LanguageScreen> {
   void initState() {
     languages = [
       Language(key: 'en', name: 'English', flag: '🇺🇸'),
-      Language(key: 'es', name: 'Spanish', flag: '🇪🇸'),
-      Language(key: 'fr', name: 'French', flag: '🇫🇷'),
+      // Language(key: 'es', name: 'Spanish', flag: '🇪🇸'),
+      Language(key: 'fr', name: 'Français', flag: '🇫🇷'),
+      Language(key: 'ar', name: 'العربية', flag: '🇸🇦'),
     ];
     super.initState();
   }
@@ -34,16 +40,18 @@ class _LanguageScreenState extends State<LanguageScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             MyText(
-              text: 'Select Language',
+              text: context.tr.selectLanguageTitle,
               fontSize: 18,
               fontWeight: FontWeight.w500,
             ),
             SizedBox(height: 20),
-            ...List.generate(3, (index) {
+            ...List.generate(languages.length, (index) {
               Language language = languages[index];
 
               return languageButton(language, () {
-                context.read<StartupCubit>().selectLanguage(language.key);
+                context.read<LocaleCubit>().changeLocale(language.key);
+                context.read<StartupCubit>().selectLanguage();
+                if (widget.isFromSettings) context.pop();
                 // Handle language selection
               });
             }),

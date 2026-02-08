@@ -72,8 +72,9 @@ class _CustomSwitchTileState extends State<CustomSwitchTile> {
               Switch(
                 value: _value,
                 onChanged: _toggle,
-                activeColor: AppColors.primary,
+                activeThumbColor: AppColors.primary,
                 inactiveThumbColor: AppColors.textSecondary,
+                // ignore: deprecated_member_use
                 inactiveTrackColor: AppColors.textSecondary.withOpacity(0.3),
               ),
             ],

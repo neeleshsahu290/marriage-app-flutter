@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 class HeightUtils {
   static double feetInchToCm(String value) {
     final parts = value.replaceAll('"', '').split("'");
@@ -9,6 +11,7 @@ class HeightUtils {
   }
 
   static String cmToFeetInch(double cm) {
+    log("heighyt utils" + cm.toString());
     final totalInches = cm / 2.54;
 
     final feet = totalInches ~/ 12;

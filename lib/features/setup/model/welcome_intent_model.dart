@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:swan_match/core/constants/asset_constants.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 
 class WelcomeIntentModel {
   final String title;
@@ -11,20 +13,22 @@ class WelcomeIntentModel {
   });
 }
 
-final List<WelcomeIntentModel> welcomeIntentList = [
-  WelcomeIntentModel(
-    title: 'Relationship Building',
-    description: 'Meaningful relationships with serious intentions',
-    icon: AssetConstants.relationshipIcon,
-  ),
-  WelcomeIntentModel(
-    title: 'Privacy Focused',
-    description: 'Your data and personal identity are securely protected',
-    icon: AssetConstants.privacyIcon,
-  ),
-  WelcomeIntentModel(
-    title: 'Family Oriented',
-    description: 'Building strong families based on shared values',
-    icon: AssetConstants.familyIcon,
-  ),
-];
+List<WelcomeIntentModel> getWelcomeIntentList(BuildContext context) {
+  return [
+    WelcomeIntentModel(
+      title: context.tr.welcomeValueRelationshipTitle,
+      description: context.tr.welcomeValueRelationshipDesc,
+      icon: AssetConstants.relationshipIcon,
+    ),
+    WelcomeIntentModel(
+      title: context.tr.welcomeValuePrivacyTitle,
+      description: context.tr.welcomeValuePrivacyDesc,
+      icon: AssetConstants.privacyIcon,
+    ),
+    WelcomeIntentModel(
+      title: context.tr.welcomeValueFamilyTitle,
+      description: context.tr.welcomeValueFamilyDesc,
+      icon: AssetConstants.familyIcon,
+    ),
+  ];
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 
 import 'package:swan_match/features/matches/presentation/widgets/profile_card.dart';
 import 'package:swan_match/features/matches/provider/matches_cubit.dart';
@@ -20,20 +21,10 @@ class MatchesScreen extends StatefulWidget {
 class _MatchesScreenState extends State<MatchesScreen> {
   int selectedTab = 0;
 
-  final List<String> tabs = ["Received", "Accepted", "Sent"];
-
   @override
   void initState() {
     super.initState();
-
-    // Load once (safe with singleton)
-    final cubit = context.read<MatchesCubit>();
-
-    // if (cubit.state.received.isEmpty &&
-    //     cubit.state.accepted.isEmpty &&
-    //     cubit.state.sent.isEmpty) {
-    cubit.loadAll();
-    //}
+    context.read<MatchesCubit>().loadAll();
   }
 
   @override
@@ -89,22 +80,21 @@ class _MatchesScreenState extends State<MatchesScreen> {
       child: BlocBuilder<MatchesCubit, MatchesState>(
         builder: (context, state) {
           return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _tabButton(
-                label: "Received",
+                label: context.tr.matchesReceived,
                 isSelected: selectedTab == 0,
                 count: state.received.length,
                 onTap: () => setState(() => selectedTab = 0),
               ),
               _tabButton(
-                label: "Accepted",
+                label: context.tr.matchesAccepted,
                 isSelected: selectedTab == 1,
                 count: state.accepted.length,
                 onTap: () => setState(() => selectedTab = 1),
               ),
               _tabButton(
-                label: "Sent",
+                label: context.tr.matchesSent,
                 isSelected: selectedTab == 2,
                 count: state.sent.length,
                 onTap: () => setState(() => selectedTab = 2),
@@ -122,19 +112,21 @@ class _MatchesScreenState extends State<MatchesScreen> {
     required int count,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.secondary : AppColors.cardBackground,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            width: 1.2,
-            color: isSelected ? AppColors.primary : AppColors.textSecondary,
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.secondary : AppColors.cardBackground,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              width: 1.2,
+              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+            ),
           ),
+          child: Center(child: MyText(text: "$label ($count)", fontSize: 14)),
         ),
-        child: MyText(text: "$label ($count)", fontSize: 14),
       ),
     );
   }
@@ -156,7 +148,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
 
     if (status == MatchesLoadStatus.error) {
       return Center(
-        child: MyText(text: "Something went wrong", color: Colors.red),
+        child: MyText(text: context.tr.genericError, color: Colors.red),
       );
     }
 
@@ -169,30 +161,32 @@ class _MatchesScreenState extends State<MatchesScreen> {
     );
   }
 
+  // ---------------- EMPTY STATES ----------------
+
   Widget _emptyByType(CardType type) {
     switch (type) {
       case CardType.recieved:
-        return const EmptyStateWidget(
-          title: "No Requests Yet",
-          subtitle: "When someone sends you a request, it will appear here",
+        return EmptyStateWidget(
+          title: context.tr.emptyReceivedTitle,
+          subtitle: context.tr.emptyReceivedSubtitle,
         );
 
       case CardType.accepted:
-        return const EmptyStateWidget(
-          title: "No Matches Yet",
-          subtitle: "Start connecting with people you like",
+        return EmptyStateWidget(
+          title: context.tr.emptyAcceptedTitle,
+          subtitle: context.tr.emptyAcceptedSubtitle,
         );
 
       case CardType.sent:
-        return const EmptyStateWidget(
-          title: "No Sent Requests",
-          subtitle: "Send a request to start a conversation",
+        return EmptyStateWidget(
+          title: context.tr.emptySentTitle,
+          subtitle: context.tr.emptySentSubtitle,
         );
 
       case CardType.recommend:
-        return const EmptyStateWidget(
-          title: "No Profiles Found",
-          subtitle: "We’re finding better matches for you",
+        return EmptyStateWidget(
+          title: context.tr.noProfilesFoundTitle,
+          subtitle: context.tr.findingBetterMatches,
         );
     }
   }

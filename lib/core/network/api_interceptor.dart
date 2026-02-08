@@ -23,7 +23,8 @@ class ApiInterceptor extends Interceptor {
 
     // Debug log
     // ignore: avoid_print
-    print('➡️ ${options.method} ${options.uri}');
+    print('➡️ ${options.method} ${options.uri}. $token');
+
     handler.next(options);
   }
 
@@ -36,6 +37,13 @@ class ApiInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
+    final statusCode = err.response?.statusCode;
+    final uri = err.requestOptions.uri;
+    final errorData = err.response?.data;
+
+    print('❌ ERROR [$statusCode] $uri');
+    print('📛 MESSAGE: ${err.message}');
+    print('📦 RESPONSE: $errorData');
     final networkException = NetworkExceptions.fromDioError(err);
 
     handler.reject(

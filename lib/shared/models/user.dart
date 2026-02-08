@@ -32,6 +32,18 @@ class User {
     required this.updatedAt,
     required this.isSentByMe,
     required this.requestType,
+    required this.latitude,
+    required this.longitude,
+
+    required this.phoneVerified,
+    required this.emailVerified,
+    required this.isActive,
+
+    required this.showOnlineStatus,
+    required this.showEmail,
+    required this.showPhone,
+
+    required this.photoVisibility,
   });
 
   final String? matchId;
@@ -68,6 +80,19 @@ class User {
   final String? email;
   final bool? isSentByMe;
   final String? requestType;
+
+  final double? latitude;
+  final double? longitude;
+
+  final bool? phoneVerified;
+  final bool? emailVerified;
+  final bool? isActive;
+
+  final bool? showOnlineStatus;
+  final bool? showEmail;
+  final bool? showPhone;
+
+  final String? photoVisibility;
 
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -123,6 +148,23 @@ class User {
       email: json["email"],
       isSentByMe: json["is_sent_by_me"],
       requestType: json["request_type"],
+      latitude: json["latitude"] == null
+          ? null
+          : double.tryParse(json["latitude"].toString()),
+
+      longitude: json["longitude"] == null
+          ? null
+          : double.tryParse(json["longitude"].toString()),
+
+      phoneVerified: json["phone_verified"],
+      emailVerified: json["email_verified"],
+      isActive: json["is_active"],
+
+      showOnlineStatus: json["show_online_status"],
+      showEmail: json["show_email"],
+      showPhone: json["show_phone"],
+
+      photoVisibility: json["photo_visibility"],
 
       createdAt: DateTime.tryParse(json["created_at"] ?? ""),
       updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
@@ -186,6 +228,33 @@ class User {
           ? null
           : map["is_sent_by_me"] == 1,
       requestType: map["request_type"],
+      latitude: map["latitude"] == null
+          ? null
+          : double.tryParse(map["latitude"].toString()),
+
+      longitude: map["longitude"] == null
+          ? null
+          : double.tryParse(map["longitude"].toString()),
+
+      phoneVerified: map["phone_verified"] == null
+          ? null
+          : map["phone_verified"] == 1,
+
+      emailVerified: map["email_verified"] == null
+          ? null
+          : map["email_verified"] == 1,
+
+      isActive: map["is_active"] == null ? null : map["is_active"] == 1,
+
+      showOnlineStatus: map["show_online_status"] == null
+          ? null
+          : map["show_online_status"] == 1,
+
+      showEmail: map["show_email"] == null ? null : map["show_email"] == 1,
+
+      showPhone: map["show_phone"] == null ? null : map["show_phone"] == 1,
+
+      photoVisibility: map["photo_visibility"],
 
       createdAt: DateTime.tryParse(map["created_at"] ?? ""),
       updatedAt: DateTime.tryParse(map["updated_at"] ?? ""),
@@ -222,6 +291,18 @@ class User {
       "email": email,
       "is_sent_by_me": isSentByMe,
       "request_type": requestType,
+      "latitude": latitude,
+      "longitude": longitude,
+
+      "phone_verified": phoneVerified,
+      "email_verified": emailVerified,
+      "is_active": isActive,
+
+      "show_online_status": showOnlineStatus,
+      "show_email": showEmail,
+      "show_phone": showPhone,
+
+      "photo_visibility": photoVisibility,
       "created_at": createdAt?.toIso8601String(),
       "updated_at": updatedAt?.toIso8601String(),
     };
@@ -260,6 +341,21 @@ class User {
       "email": email,
       "is_sent_by_me": isSentByMe == null ? null : (isSentByMe! ? 1 : 0),
       "request_type": requestType,
+      "latitude": latitude,
+      "longitude": longitude,
+
+      "phone_verified": phoneVerified == null ? null : (phoneVerified! ? 1 : 0),
+      "email_verified": emailVerified == null ? null : (emailVerified! ? 1 : 0),
+      "is_active": isActive == null ? null : (isActive! ? 1 : 0),
+
+      "show_online_status": showOnlineStatus == null
+          ? null
+          : (showOnlineStatus! ? 1 : 0),
+
+      "show_email": showEmail == null ? null : (showEmail! ? 1 : 0),
+      "show_phone": showPhone == null ? null : (showPhone! ? 1 : 0),
+
+      "photo_visibility": photoVisibility,
       "created_at": createdAt?.toIso8601String(),
       "updated_at": updatedAt?.toIso8601String(),
     };

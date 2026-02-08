@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -8,9 +6,11 @@ import 'package:swan_match/core/router/route_names.dart';
 import 'package:swan_match/core/storage/app_prefs.dart';
 import 'package:swan_match/core/storage/pref_names.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/shared/models/user.dart';
 import 'package:swan_match/shared/widgets/box/tag_chip.dart';
 import 'package:swan_match/shared/widgets/buttons/outline_button.dart';
+import 'package:swan_match/shared/widgets/common/header_image_scroll.dart';
 import 'package:swan_match/shared/widgets/my_text.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -23,7 +23,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   User? user;
 
-  // ---------------- INIT ----------------
   @override
   void initState() {
     super.initState();
@@ -43,7 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     if (user == null) {
-      return const Scaffold(body: Center(child: Text("No profile data found")));
+      return Scaffold(body: Center(child: Text(context.tr.noProfileFound)));
     }
 
     return SafeArea(
@@ -52,7 +51,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              _buildHeaderImage(),
+              HeaderImageScroll(
+                images: user!.profilePhotos,
+                status: 'visible_to_matches',
+              ),
 
               Padding(
                 padding: const EdgeInsets.all(20),
@@ -76,7 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 14),
 
                     MyText(
-                      text: "About Me",
+                      text: context.tr.aboutMe,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
@@ -89,12 +91,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       return _infoRow(label, value);
                     }),
 
-                    _buildListSection("My Habits", user!.habits),
+                    _buildListSection(context.tr.myHabits, user!.habits),
 
                     const SizedBox(height: 20),
 
                     OutlineButton(
-                      text: 'Edit Profile Details',
+                      text: context.tr.editProfileDetails,
                       onPressed: () {
                         context.push(RouteNames.onboarding, extra: true);
                       },
@@ -110,54 +112,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // ---------------- PROFILE FIELDS ----------------
+
   List<Map<String, String?>> _buildProfileFields(User user) {
     return [
-      {"Phone": user.phone},
-      {"Email": user.email},
-      {"Gender": user.gender},
-      {"Date of Birth": _formatDate(user.dob)},
-      {"Height": user.heightCm != null ? "${user.heightCm} cm" : null},
-      {"Religion": user.religion},
-      {"Faith Level": user.religiousFaith},
-      {"Marital Status": user.maritalStatus},
-      {"Has Children": user.hasChildren == true ? "Yes" : "No"},
-      {"Family Type": user.familyType},
-      {"Parents Status": user.parentsStatus},
-      {"Education": user.educationLevel},
-      {"Profession": user.profession},
-      {"Languages": _join(user.languagesKnown)},
-      {"Personality": _join(user.personalityTraits)},
-      {"Hobbies": _join(user.hobbies)},
+      {context.tr.labelPhone: user.phone},
+      {context.tr.labelEmail: user.email},
+
+      {context.tr.labelGender: context.t(user.gender ?? "")},
+
+      {context.tr.labelDob: _formatDate(user.dob)},
+
+      {
+        context.tr.labelHeight: user.heightCm != null
+            ? "${user.heightCm} cm"
+            : null,
+      },
+
+      {context.tr.labelReligion: context.t(user.religion ?? "")},
+
+      {context.tr.labelFaithLevel: context.t(user.religiousFaith ?? "")},
+
+      {context.tr.labelMaritalStatus: context.t(user.maritalStatus ?? "")},
+
+      {
+        context.tr.labelHasChildren: user.hasChildren == true
+            ? context.tr.yes
+            : context.tr.no,
+      },
+
+      {context.tr.labelFamilyType: context.t(user.familyType ?? "")},
+
+      {context.tr.labelParentsStatus: context.t(user.parentsStatus ?? "")},
+
+      {context.tr.labelEducation: context.t(user.educationLevel ?? "")},
+
+      {context.tr.labelProfession: context.t(user.profession ?? "")},
+
+      {context.tr.labelLanguages: _joinTranslated(user.languagesKnown)},
+
+      {context.tr.labelPersonality: _joinTranslated(user.personalityTraits)},
+
+      {context.tr.labelHobbies: _joinTranslated(user.hobbies)},
     ];
   }
 
-  // ---------------- HEADER IMAGE ----------------
-
-  Widget _buildHeaderImage() {
-    // final imageUrl = user!.profilePhotos.isNotEmpty
-    //     ? user!.profilePhotos.first
-    //     : null;
-    final imageUrl = "https://picsum.photos/500/700";
-
-    return SizedBox(
-      height: 35.h,
-      width: double.infinity,
-      child: imageUrl != null
-          ? CachedNetworkImage(
-              imageUrl: imageUrl,
-              fit: BoxFit.cover,
-
-              placeholder: (context, url) =>
-                  Container(color: Colors.grey.shade300),
-
-              errorWidget: (_, __, ___) =>
-                  const Center(child: Icon(Icons.person, size: 80)),
-            )
-          : const Center(child: Icon(Icons.person, size: 80)),
-    );
-  }
-
   // ---------------- ROW ITEM ----------------
+
   Widget _infoRow(String label, String? value) {
     if (value == null || value.isEmpty) return const SizedBox();
 
@@ -194,6 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // ---------------- BIO ----------------
+
   Widget _bioSection(String? bio) {
     if (bio == null || bio.isEmpty) return const SizedBox();
 
@@ -202,7 +203,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          MyText(text: "Bio", fontSize: 18, fontWeight: FontWeight.w600),
+          MyText(
+            text: context.tr.bio,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
           const SizedBox(height: 6),
           Container(
             decoration: BoxDecoration(
@@ -218,6 +223,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // ---------------- LIST SECTION ----------------
+
   Widget _buildListSection(String title, List<String> items) {
     if (items.isEmpty) return const SizedBox();
 
@@ -239,7 +245,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // ---------------- HELPERS ----------------
-  String _join(List<String> list) => list.isEmpty ? "" : list.join(", ");
+
+  String _joinTranslated(List<dynamic>? values) {
+    if (values == null || values.isEmpty) return '';
+
+    return values.map((v) => context.t(v.toString())).join(', ');
+  }
 
   String? _formatDate(DateTime? date) {
     if (date == null) return null;

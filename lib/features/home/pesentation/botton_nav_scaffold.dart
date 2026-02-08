@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:swan_match/core/constants/app_constants.dart';
 import 'package:swan_match/core/constants/asset_constants.dart';
 import 'package:swan_match/core/router/route_names.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
-import 'package:swan_match/features/settings/presentaton/settings_screen.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/shared/widgets/common/custom_app_bar.dart';
 import 'package:swan_match/shared/widgets/my_text.dart';
 
@@ -64,6 +63,7 @@ class BottomNavScaffold extends StatelessWidget {
               // ),
               SvgPicture.asset(
                 selectedIcon,
+                // ignore: deprecated_member_use
                 color: isSelected ? AppColors.primary : AppColors.textSecondary,
                 height: isSelected ? 32 : 26,
                 width: isSelected ? 32 : 26,
@@ -90,7 +90,7 @@ class BottomNavScaffold extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Swan',
+        title: context.tr.appName,
         leading: Icon(
           size: 32,
           Icons.favorite,
@@ -115,29 +115,25 @@ class BottomNavScaffold extends StatelessWidget {
           children: [
             _navItem(
               selectedIcon: AssetConstants.homeIcon,
-              //    unSelectedIcon: Icons.home_outlined,
-              label: "Home",
+              label: context.tr.navHome,
               isSelected: current == 0,
               onTap: () => _onTap(context, 0),
             ),
             _navItem(
               selectedIcon: AssetConstants.exploreIcon,
-              //    unSelectedIcon: Icons.favorite_border,
-              label: "Explore",
+              label: context.tr.navExplore,
               isSelected: current == 1,
               onTap: () => _onTap(context, 1),
             ),
             _navItem(
               selectedIcon: AssetConstants.chatIcon,
-              //  unSelectedIcon: Icons.chat_bubble_outline,
-              label: "Chat",
+              label: context.tr.navChat,
               isSelected: current == 2,
               onTap: () => _onTap(context, 2),
             ),
             _navItem(
               selectedIcon: AssetConstants.userIcon,
-              // unSelectedIcon: Icons.person_outline,
-              label: "Profile",
+              label: context.tr.navProfile,
               isSelected: current == 3,
               onTap: () => _onTap(context, 3),
             ),

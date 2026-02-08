@@ -7,6 +7,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/constants/asset_constants.dart';
 import 'package:swan_match/core/router/route_names.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/features/auth/cubit/auth_cubit.dart';
 import 'package:swan_match/features/auth/cubit/ui_cubit.dart';
 import 'package:swan_match/features/auth/cubit/ui_state.dart';
@@ -55,8 +56,8 @@ class _PhoneScreenState extends State<PhoneScreen> {
                   children: [
                     HeaderWidgetWithIcon(
                       iconName: AssetConstants.phoneIcon,
-                      title: "Phone Verification",
-                      descn: "We'll send you a code to verify your number",
+                      title: context.tr.phoneVerificationTitle,
+                      descn: context.tr.phoneVerificationDesc,
                     ),
 
                     CountrySelection(
@@ -90,7 +91,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
               return PrimaryButton(
                 isLoading: state.isLoading,
                 isDisabled: !state.isDisabled,
-                btnText: 'Continue',
+                btnText: context.tr.continueText,
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     context.read<UiCubit>().setLoading(true);

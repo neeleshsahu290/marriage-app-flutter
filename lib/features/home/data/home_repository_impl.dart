@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:swan_match/core/constants/api_constants.dart';
 import 'package:swan_match/core/network/api_client.dart';
 import 'package:swan_match/core/storage/squlite_db_storage.dart';
+import 'package:swan_match/core/utils/pref_utils.dart';
 import 'package:swan_match/features/home/data/home_repository.dart';
 import 'package:swan_match/match_status.dart';
 import 'package:swan_match/shared/models/user.dart';
@@ -20,8 +23,15 @@ class HomeRepositoryImpl implements HomeRepository {
   @override
   Future<List<User>> getAllMatches() async {
     try {
-      final response = await api.get(ApiConstants.getAllMatches);
+      if (await PrefUtils.canApiCallAgain()) {
+        try {
+          await api.post(ApiConstants.createMatches);
+          await PrefUtils.saveApiCallDate();
+        } catch (e) {}
+      }
 
+      final response = await api.get(ApiConstants.getAllMatches);
+      log(response.toString());
       final List data = response.data['data'];
 
       var list = data.map((e) => User.fromJson(e)).toList();
@@ -29,6 +39,7 @@ class HomeRepositoryImpl implements HomeRepository {
       await sqlite.insertMatches(list);
       return list;
     } on DioException catch (e) {
+      log(e.toString());
       throw e.message ?? 'Something went wrong';
     }
   }

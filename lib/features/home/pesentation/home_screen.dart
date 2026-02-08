@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/features/home/cubit/home_cubit.dart';
 import 'package:swan_match/features/home/cubit/home_state.dart';
 import 'package:swan_match/features/matches/presentation/widgets/profile_card.dart';
@@ -18,18 +19,24 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int selectedTab = 0;
 
-  final List<String> tabs = ["Todays", "All"];
+  late List<String> tabs;
 
   @override
   void initState() {
-    //context.read<HomeCubit>().getAllMatches();
+    super.initState();
 
     context.read<HomeCubit>().loadHomeMatches("RECOMMENDED");
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    // localized tabs
+    tabs = [
+      context.tr.homeTabToday,
+
+      //context.tr.homeTabAll
+    ];
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: AppColors.background,
@@ -39,14 +46,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
             _buildTabs(),
 
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
 
             Expanded(
               child: IndexedStack(
                 index: selectedTab,
                 children: [
                   _buildSwipeView(CardType.recommend),
-                  _buildSwipeView(CardType.recommend),
+                  // _buildSwipeView(CardType.recommend),
                 ],
               ),
             ),
@@ -62,7 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: List.generate(
           tabs.length,
           (index) => Expanded(
@@ -90,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
           color: isSelected ? AppColors.primary : AppColors.textSecondary,
         ),
       ),
-      child: Center(child: MyText(text: "$label ", fontSize: 14)),
+      child: Center(child: MyText(text: label, fontSize: 14)),
     );
   }
 
@@ -104,13 +110,13 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         if (state.status == HomeStatus.empty) {
-          return const Center(child: Text("No profiles found"));
+          return Center(child: Text(context.tr.noProfilesFound));
         }
 
         if (state.status == HomeStatus.error) {
-          const EmptyStateWidget(
-            title: "No Profiles Found",
-            subtitle: "We’re finding better matches for you",
+          return EmptyStateWidget(
+            title: context.tr.noProfilesFoundTitle,
+            subtitle: context.tr.findingBetterMatches,
           );
         }
 

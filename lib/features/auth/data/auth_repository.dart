@@ -12,6 +12,8 @@ abstract class AuthRepository {
     required String phone,
     required String email,
     required String password,
+    required bool emailVerified,
+    required bool phoneVerified,
   });
 
   // Login flow

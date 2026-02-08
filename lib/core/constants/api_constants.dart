@@ -1,10 +1,10 @@
 class ApiConstants {
   ApiConstants._();
 
-  static const bool isProd = false;
+  static const bool isProd = true;
 
   static const String baseUrl = isProd
-      ? 'https://marriage-app-backend-production-f051.up.railway.app/api'
+      ? 'https://marriage-app-backend.onrender.com/api'
       : 'http://192.168.29.252:4000/api';
 
   static const String loginEndpoint = '/auth/login';
@@ -26,10 +26,14 @@ class ApiConstants {
 
   static const String updateUserFeilds = "/users/update-fields";
 
+  static const String createMatches = "/matches/create-matches";
+
   static const String sendRequest = "/matches/send";
   static const String passRequest = "/matches/pass";
   static const String changeStatus = "/matches/status";
   static const String blockRequest = "/matches/block";
 
   static String saveProfile = "/users/profile";
+
+  static String updatePreferences = "/users/preferences";
 }

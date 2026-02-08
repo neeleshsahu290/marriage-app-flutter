@@ -46,7 +46,7 @@ class PrimaryTextField extends StatelessWidget {
     this.textColor = AppColors.textPrimary,
     this.backgroundColor = AppColors.cardBackground,
     this.label,
-    this.initalValue
+    this.initalValue,
   });
   @override
   Widget build(BuildContext context) {
@@ -54,31 +54,29 @@ class PrimaryTextField extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         label != null
-            ? Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 5.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      labelIcon != null
-                          ? SizedBox(
-                              height: 16,
-                              width: 16,
-                              child: UnconstrainedBox(
-                                child: SvgPicture.asset(labelIcon!),
-                              ),
-                            )
-                          : SizedBox.shrink(),
+            ? Padding(
+                padding: const EdgeInsets.only(bottom: 5.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    labelIcon != null
+                        ? SizedBox(
+                            height: 16,
+                            width: 16,
+                            child: UnconstrainedBox(
+                              child: SvgPicture.asset(labelIcon!),
+                            ),
+                          )
+                        : SizedBox.shrink(),
 
-                      MyText(
-                        text: label ?? "",
-                        color: AppColors.textPrimary,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ],
-                  ),
+                    MyText(
+                      text: label ?? "",
+                      color: AppColors.textPrimary,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ],
                 ),
               )
             : const SizedBox.shrink(),

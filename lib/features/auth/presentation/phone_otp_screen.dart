@@ -1,11 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/router/route_names.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/features/auth/cubit/auth_cubit.dart';
 import 'package:swan_match/features/auth/cubit/ui_cubit.dart';
 import 'package:swan_match/features/auth/cubit/ui_state.dart';
@@ -37,13 +40,13 @@ class PhoneOtpScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   MyText(
-                    text: "Enter Verification Code",
+                    text: context.tr.enterVerificationCode,
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w600,
                   ),
                   SizedBox(height: 2.h),
                   MyText(
-                    text: "We'll send you a code to verify your number",
+                    text: context.tr.verificationCodeDesc,
                     color: AppColors.textSecondary,
                     textAlignment: TextAlign.center,
                   ),
@@ -80,7 +83,7 @@ class PhoneOtpScreen extends StatelessWidget {
               return PrimaryButton(
                 isLoading: state.isLoading,
                 isDisabled: !state.isDisabled,
-                btnText: 'Confirm',
+                btnText: context.tr.confirm,
                 onPressed: () async {
                   if (_formkey.currentState!.validate()) {
                     context.read<UiCubit>().setLoading(true);

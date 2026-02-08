@@ -1,5 +1,7 @@
 import 'package:get_it/get_it.dart';
+import 'package:swan_match/core/locale/locale_cubit.dart';
 import 'package:swan_match/core/network/api_client.dart';
+import 'package:swan_match/core/services/supabase_service.dart';
 import 'package:swan_match/core/storage/app_prefs.dart';
 import 'package:swan_match/core/storage/squlite_db_storage.dart';
 import 'package:swan_match/features/auth/cubit/auth_cubit.dart';
@@ -26,6 +28,11 @@ final getIt = GetIt.instance;
 Future<void> setupDI() async {
   // Shared Prefs
   await AppPrefs.init();
+
+  // Supabase
+  await SupabaseService.initialize();
+
+  getIt.registerLazySingleton(() => LocaleCubit());
 
   // Api
   getIt.registerLazySingleton(() => ApiClient());

@@ -3,26 +3,20 @@ import 'package:swan_match/core/storage/pref_names.dart';
 
 class StartupRepository {
   bool isSplash = false;
-  // Storage keys
-  static const _welcomeKey = 'startup_welcome_done';
-  static const _languageKey = 'startup_language_selected';
-  static const _intentKey = 'startup_intent_selected';
-  static const _languageCodeKey = 'startup_language_code';
-  static const _intentTypeKey = 'startup_intent_type';
 
   StartupRepository();
 
   bool isWelcomeDone() {
-    return AppPrefs.getBool(_welcomeKey);
+    return AppPrefs.getBool(PrefNames.welcomeKey);
   }
 
   Future<void> setWelcomeDone() async {
-    await AppPrefs.setBool(_welcomeKey, true);
+    await AppPrefs.setBool(PrefNames.welcomeKey, true);
     isSplash = true;
   }
 
   bool isLanguageDone() {
-    return AppPrefs.getBool(_languageKey);
+    return AppPrefs.getBool(PrefNames.languageKey);
   }
 
   Future<void> clearSession() async {
@@ -30,26 +24,26 @@ class StartupRepository {
   }
 
   Future<void> setLanguageDone({required String languageCode}) async {
-    await AppPrefs.setBool(_languageKey, true);
-    await AppPrefs.setString(_languageCodeKey, languageCode);
+    await AppPrefs.setBool(PrefNames.languageKey, true);
+    await AppPrefs.setString(PrefNames.languageCodeKey, languageCode);
   }
 
   String? getSelectedLanguage() {
     return null;
-    //return _prefs.getString(_languageCodeKey);
+    //return PREFNAMES.prefs.getString(PREFNAMES.languageCodeKey);
   }
 
   bool isIntentDone() {
-    return AppPrefs.getBool(_intentKey);
+    return AppPrefs.getBool(PrefNames.intentKey);
   }
 
   Future<void> setIntentDone({required String intentType}) async {
-    await AppPrefs.setBool(_intentKey, true);
-    // await _prefs.setString(_intentTypeKey, intentType);
+    await AppPrefs.setBool(PrefNames.intentKey, true);
+    // await PREFNAMES.prefs.setString(PREFNAMES.intentTypeKey, intentType);
   }
 
   // String? getSelectedIntent() {
-  //   retauthurn _prefs.getString(_intentTypeKey);
+  //   retauthurn PREFNAMES.prefs.getString(PREFNAMES.intentTypeKey);
   // }
 
   bool isLoggedIn() {
@@ -57,19 +51,19 @@ class StartupRepository {
   }
 
   bool isOnBoardingDone() {
-    return AppPrefs.getBool(PrefNames.isOnboardingCompleted);
+    return AppPrefs.getBool(PrefNames.onboardingCompleted);
   }
 
   Future<void> setOnboardingDone() async {
-    await AppPrefs.setBool(PrefNames.isOnboardingCompleted, true);
-    // await _prefs.setString(_intentTypeKey, intentType);
+    await AppPrefs.setBool(PrefNames.onboardingCompleted, true);
+    // await PrefNames.prefs.setString(PrefNames.intentTypeKey, intentType);
   }
 
   Future<void> clearStartup() async {
-    await AppPrefs.remove(_welcomeKey);
-    await AppPrefs.remove(_languageKey);
-    await AppPrefs.remove(_intentKey);
-    await AppPrefs.remove(_languageCodeKey);
-    await AppPrefs.remove(_intentTypeKey);
+    await AppPrefs.remove(PrefNames.welcomeKey);
+    await AppPrefs.remove(PrefNames.languageKey);
+    await AppPrefs.remove(PrefNames.intentKey);
+    await AppPrefs.remove(PrefNames.languageCodeKey);
+    await AppPrefs.remove(PrefNames.intentTypeKey);
   }
 }

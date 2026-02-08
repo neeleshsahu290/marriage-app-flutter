@@ -1,6 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/core/utils/utils.dart';
 import 'package:swan_match/features/auth/data/auth_repository.dart';
+
+import '../../../main.dart';
 
 part 'auth_state.dart';
 
@@ -39,9 +44,9 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   // Send Phone OTP
-  Future<bool> sendPhoneOtp(String phone) async {
+  Future<bool> sendPhoneOtp(String? phone) async {
     try {
-      await repository.sendPhoneOtp(phone);
+      await repository.sendPhoneOtp(phone ?? state.phone);
       emit(state.copyWith(phone: phone));
 
       return true;
@@ -55,6 +60,9 @@ class AuthCubit extends Cubit<AuthState> {
   Future<bool> verifyEmailOtp({required String otp}) async {
     try {
       await repository.verifyEmailOtp(email: state.email, otp: otp);
+      emit(state.copyWith(emailVerified: true));
+      Utils.showSuccess(globalContext.tr.emailVerified);
+
       return true;
     } catch (e) {
       Utils.showError(e.toString());
@@ -66,6 +74,8 @@ class AuthCubit extends Cubit<AuthState> {
   Future<bool> verifyPhoneOtp({required String otp}) async {
     try {
       await repository.verifyPhoneOtp(phone: state.phone, otp: otp);
+      emit(state.copyWith(phoneVerified: true));
+      Utils.showSuccess(globalContext.tr.phoneVerified);
       return true;
     } catch (e) {
       Utils.showError(e.toString());
@@ -80,7 +90,10 @@ class AuthCubit extends Cubit<AuthState> {
         phone: state.phone,
         email: state.email,
         password: password,
+        phoneVerified: state.phoneVerified,
+        emailVerified: state.emailVerified,
       );
+      Utils.showSuccess(globalContext.tr.profileCreatedReady);
       return true;
     } catch (e) {
       Utils.showError(e.toString());

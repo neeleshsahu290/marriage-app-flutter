@@ -26,6 +26,7 @@ class NoChatsEmptyWidget extends StatelessWidget {
               height: 120,
               width: 120,
               decoration: BoxDecoration(
+                // ignore: deprecated_member_use
                 color: primaryColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
@@ -47,7 +48,7 @@ class NoChatsEmptyWidget extends StatelessWidget {
             const SizedBox(height: 8),
 
             const Text(
-              "Start a conversation by accepting a match 💬",
+              "Start a conversation by accepting a match",
               style: TextStyle(fontSize: 14, color: Colors.grey),
               textAlign: TextAlign.center,
             ),

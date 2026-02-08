@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/router/route_names.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/core/utils/utils.dart';
 import 'package:swan_match/features/onboarding/cubit/onboarding_form_cubit.dart';
 import 'package:swan_match/features/onboarding/model/error_model.dart';
@@ -31,7 +32,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   List<FormPageModel> pages = [];
 
   loadPages() {
-    pages = formFeilds.map((e) => FormPageModel.fromJson(e)).toList();
+    final pageList = formFeilds.map((e) => FormPageModel.fromJson(e)).toList();
+
+    if (widget.isEdit && pageList.isNotEmpty) {
+      pageList.removeLast();
+    }
+
+    pages = pageList;
   }
 
   loadFildsData() {
@@ -51,18 +58,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     context.read<OnboardingFormCubit>().insertFeildData(
       fieldsData,
       errorListmap,
+      isEdit: widget.isEdit,
     );
-
-    if (widget.isEdit) {}
   }
+
+  bool isLoading = true;
 
   @override
   void initState() {
-    loadPages();
-    loadFildsData();
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await context.read<OnboardingFormCubit>().setProfileData();
+      await loadPages();
+      await loadFildsData();
+      if (widget.isEdit) {
+        await context.read<OnboardingFormCubit>().setProfileData();
+      }
+      isLoading = false;
       setState(() {});
     });
   }
@@ -74,7 +85,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> submit(BuildContext context) async {
-    showCustomProgressDialog(context, message: "Submitting...");
+    showCustomProgressDialog(context, message: context.tr.submitting);
 
     final isValue = await context.read<OnboardingFormCubit>().submitForm();
 
@@ -93,107 +104,110 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: AppColors.background,
-        body: Column(
-          children: [
-            SizedBox(height: 2.h),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                height: 6,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: ValueListenableBuilder(
-                  valueListenable: _currentIndex,
-                  builder: (context, value, _) {
-                    return LayoutBuilder(
-                      builder: (context, constraints) {
-                        final progress = (value + 1) / pages.length;
+        body: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  SizedBox(height: 2.h),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: ValueListenableBuilder(
+                        valueListenable: _currentIndex,
+                        builder: (context, value, _) {
+                          return LayoutBuilder(
+                            builder: (context, constraints) {
+                              final progress = (value + 1) / pages.length;
 
-                        return Align(
-                          alignment: Alignment.centerLeft,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            width: constraints.maxWidth * progress,
-                            height: 6,
-                            decoration: const BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(6),
-                                bottomLeft: Radius.circular(6),
-                              ),
-                            ),
+                              return Align(
+                                alignment: Alignment.centerLeft,
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut,
+                                  width: constraints.maxWidth * progress,
+                                  height: 6,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(6),
+                                      bottomLeft: Radius.circular(6),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      physics: const NeverScrollableScrollPhysics(),
+
+                      itemCount: pages.length,
+                      onPageChanged: (index) {
+                        _currentIndex.value = index;
+                      },
+                      itemBuilder: (context, index) {
+                        return RepaintBoundary(
+                          child: OnboardingPage(
+                            pageData: pages[index],
+                            currentPage: index,
+                            isEdit: widget.isEdit,
                           ),
                         );
                       },
-                    );
-                  },
-                ),
-              ),
-            ),
-
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-
-                itemCount: pages.length,
-                onPageChanged: (index) {
-                  _currentIndex.value = index;
-                },
-                itemBuilder: (context, index) {
-                  return RepaintBoundary(
-                    child: OnboardingPage(
-                      pageData: pages[index],
-                      currentPage: index,
                     ),
-                  );
-                },
-              ),
-            ),
+                  ),
 
-            const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-            ValueListenableBuilder(
-              valueListenable: _currentIndex,
-              builder: (context, value, child) {
-                return NavigateBtn(
-                  currentPage: value,
+                  ValueListenableBuilder(
+                    valueListenable: _currentIndex,
+                    builder: (context, value, child) {
+                      return NavigateBtn(
+                        currentPage: value,
 
-                  onNextClick: () {
-                    bool isValid = context
-                        .read<OnboardingFormCubit>()
-                        .isValidFeilds(value);
-                    if (isValid) {
-                      if (value < pages.length - 1) {
-                        _pageController.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      } else {
-                        submit(context);
-                      }
-                    } else {
-                      Utils.showError('Please fill all the feilds');
-                    }
-                  },
-                  onPreviousClick: () {
-                    if (value > 0) {
-                      _pageController.previousPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
+                        onNextClick: () {
+                          bool isValid = context
+                              .read<OnboardingFormCubit>()
+                              .isValidFeilds(value);
+                          if (isValid) {
+                            if (value < pages.length - 1) {
+                              _pageController.nextPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            } else {
+                              submit(context);
+                            }
+                          } else {
+                            Utils.showError(context.tr.errorFillAllFields);
+                          }
+                        },
+                        onPreviousClick: () {
+                          if (value > 0) {
+                            _pageController.previousPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        },
                       );
-                    }
-                  },
-                );
-              },
-            ),
+                    },
+                  ),
 
-            const SizedBox(height: 30),
-          ],
-        ),
+                  const SizedBox(height: 30),
+                ],
+              ),
       ),
     );
   }

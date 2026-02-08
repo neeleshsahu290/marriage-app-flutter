@@ -19,12 +19,23 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
   Future<void> saveProfile(Map<String, dynamic> formValues) async {
     try {
       final payload = _prepareOnboardingPayload(formValues);
+      log(jsonEncode(payload));
       var response = await api.post(ApiConstants.saveProfile, data: payload);
 
       await AppPrefs.setString(
         PrefNames.userProfile,
-        jsonEncode(response.data['data']),
+        jsonEncode(response.data['data']['profile']),
       );
+      try {
+        if (response.data['data']['preferences'] != null) {
+          await AppPrefs.setString(
+            PrefNames.userPreferences,
+            jsonEncode(response.data['data']['preferences']),
+          );
+        }
+      } catch (e) {
+        log("Error saving preferences: $e");
+      }
     } on DioException catch (e) {
       log(e.message.toString());
       throw Exception(
@@ -57,9 +68,10 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
     Map<String, dynamic> formValues,
   ) {
     final payload = Map<String, dynamic>.from(formValues);
+    final pref = {};
 
     // Remove file objects
-    payload["profile_photos"] = [];
+    //  payload["profile_photos"] = [];
     try {
       // DOB: timestamp → yyyy-MM-dd
       if (payload["dob"] != null) {
@@ -73,7 +85,7 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
 
     // Has Children: 'Yes'/'No' → bool
     if (payload["has_children"] != null) {
-      payload["has_children"] = payload["has_children"] == 'Yes' ? true : false;
+      payload["has_children"] = payload["has_children"] == 'YES' ? true : false;
     }
 
     // Height: feet/inch → cm
@@ -81,19 +93,35 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
       payload["height_cm"] = HeightUtils.feetInchToCm(payload["height_cm"]);
     }
 
-    // Languages: object list → string list
-    if (payload["languages_known"] != null) {
-      payload["languages_known"] = (payload["languages_known"] as List)
-          .map((e) => e["name"].toString())
-          .toList();
-    }
-
     // Marriage priority from prefs
     payload["marriage_priority"] = AppPrefs.getString(
       PrefNames.marriagePriority,
     );
 
-    return payload;
+    // Age range
+    final ageRange = payload.remove("preferred_age_range");
+    if (ageRange is Map) {
+      pref["min_age"] = ageRange["min"];
+      pref["max_age"] = ageRange["max"];
+    }
+
+    // Distance
+    final distance = payload.remove("preferred_distance");
+    if (distance != null) {
+      pref["max_distance_km"] = distance;
+    }
+
+    // Minimum education
+    final minEducation = payload.remove("preferred_min_education");
+    if (minEducation != null) {
+      pref["min_education_level"] = minEducation;
+    }
+
+    // ---------- Optional cleanup ----------
+    payload.removeWhere((key, value) => value == null);
+    pref.removeWhere((key, value) => value == null);
+
+    return {"user_profile": payload, "preferences": pref};
   }
 
   Map<String, dynamic> prepareFormValuesFromApi(Map<String, dynamic> apiData) {
@@ -127,7 +155,6 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
         formValues[entry.key] = entry.value;
       }
     }
-
     // DOB: yyyy-MM-dd → timestamp (ms)
     try {
       if (formValues["dob"] != null) {
@@ -141,22 +168,20 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
     // Has Children: bool → 'Yes'/'No'
     if (formValues["has_children"] != null) {
       formValues["has_children"] = formValues["has_children"] == true
-          ? 'Yes'
-          : 'No';
+          ? 'YES'
+          : 'NO';
     }
 
     // Height: cm → feet/inch
-    if (formValues["height_cm"] != null) {
-      formValues["height_cm"] = HeightUtils.cmToFeetInch(
-        formValues["height_cm"],
-      );
-    }
+    try {
+      if (formValues["height_cm"] != null &&
+          formValues["height_cm"].toString().isNotEmpty) {
+        final value = double.parse(formValues["height_cm"].toString());
 
-    // Languages: string list → object list
-    if (formValues["languages_known"] != null) {
-      formValues["languages_known"] = (formValues["languages_known"] as List)
-          .map((e) => {"name": e})
-          .toList();
+        formValues["height_cm"] = HeightUtils.cmToFeetInch(value);
+      }
+    } catch (e) {
+      log(e.toString());
     }
 
     // Profile photos already URLs (keep as is for edit preview)

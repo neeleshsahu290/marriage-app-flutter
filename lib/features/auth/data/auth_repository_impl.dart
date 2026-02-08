@@ -59,6 +59,7 @@ class AuthRepositoryImpl implements AuthRepository {
         data: {'phone': phone, 'otp': otp},
       );
     } on DioException catch (e) {
+      log(e.toString());
       throw e.message ?? 'Something went wrong';
     }
   }
@@ -68,11 +69,46 @@ class AuthRepositoryImpl implements AuthRepository {
     required String phone,
     required String email,
     required String password,
+    required bool emailVerified,
+    required bool phoneVerified,
   }) async {
     try {
-      await api.post(
+      final response = await api.post(
         ApiConstants.createUser,
-        data: {'phone': phone, 'email': email, 'password': password},
+        data: {
+          'phone': phone,
+          'email': email,
+          'password': password,
+          'phone_verified': phoneVerified,
+          'email_verified': emailVerified,
+        },
+      );
+
+      var data = response.data['data'];
+      await AppPrefs.setString(PrefNames.authToken, data['access_token']);
+      var user = data['user'];
+      await AppPrefs.setString(PrefNames.userId, user['user_id']);
+      await AppPrefs.setString(PrefNames.email, user['email']);
+      await AppPrefs.setString(PrefNames.phone, user['phone']);
+      await AppPrefs.setBool(PrefNames.isActive, user['is_active']);
+
+      await AppPrefs.setBool(
+        PrefNames.showOnlineStatus,
+        user['show_online_status'],
+      );
+
+      await AppPrefs.setBool(PrefNames.showEmail, user['show_email']);
+
+      await AppPrefs.setBool(PrefNames.showPhone, user['show_phone']);
+
+      await AppPrefs.setString(
+        PrefNames.photoVisibility,
+        user['photo_visibility'],
+      );
+
+      await AppPrefs.setBool(
+        PrefNames.onboardingCompleted,
+        user['onboarding_completed'],
       );
 
       await AppPrefs.setBool(PrefNames.isLoggedIn, true);
@@ -104,8 +140,6 @@ class AuthRepositoryImpl implements AuthRepository {
         ApiConstants.loginEndpoint,
         data: {'identifier': identifier, 'password': password},
       );
-      // log(response.data.toString());
-      // print(response.data);
 
       var data = response.data['data'];
       await AppPrefs.setString(PrefNames.authToken, data['access_token']);
@@ -140,12 +174,6 @@ class AuthRepositoryImpl implements AuthRepository {
         jsonEncode(user['profile']),
       );
 
-      // await AppPrefs.setBool(
-      //   PrefNames.isOnboardingCompleted,
-      //   user['onboarding_completed'],
-      // );
-
-      await AppPrefs.setBool(PrefNames.isOnboardingCompleted, false);
       await AppPrefs.setBool(PrefNames.isLoggedIn, true);
     } on DioException catch (e) {
       throw e.message ?? 'Something went wrong';

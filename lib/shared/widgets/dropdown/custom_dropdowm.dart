@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/shared/widgets/my_text.dart';
 
 class CustomDropdown extends StatefulWidget {
@@ -12,6 +13,7 @@ class CustomDropdown extends StatefulWidget {
   final List<String> dropdownList;
   final String? hint;
   final String? initialSelected;
+  final bool enabled;
 
   const CustomDropdown({
     super.key,
@@ -21,6 +23,7 @@ class CustomDropdown extends StatefulWidget {
     this.labelIcon,
     this.hint,
     this.initialSelected,
+    this.enabled = false,
   });
 
   @override
@@ -41,31 +44,29 @@ class _CustomDropdownState extends State<CustomDropdown> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 5.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                widget.labelIcon != null
-                    ? SizedBox(
-                        height: 16,
-                        width: 16,
-                        child: UnconstrainedBox(
-                          child: SvgPicture.asset(widget.labelIcon!),
-                        ),
-                      )
-                    : SizedBox.shrink(),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 5.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              widget.labelIcon != null
+                  ? SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: UnconstrainedBox(
+                        child: SvgPicture.asset(widget.labelIcon!),
+                      ),
+                    )
+                  : SizedBox.shrink(),
 
-                MyText(
-                  text: widget.label,
-                  color: AppColors.textPrimary,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ],
-            ),
+              MyText(
+                text: widget.label,
+                color: AppColors.textPrimary,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w400,
+              ),
+            ],
           ),
         ),
 
@@ -100,16 +101,21 @@ class _CustomDropdownState extends State<CustomDropdown> {
               items: widget.dropdownList.map((item) {
                 return DropdownMenuItem<String>(
                   value: item,
-                  child: MyText(text: item, fontWeight: FontWeight.w500),
+                  child: MyText(
+                    text: context.t(item),
+                    fontWeight: FontWeight.w500,
+                  ),
                 );
               }).toList(),
 
-              onChanged: (String? value) {
-                setState(() {
-                  _selectedItem = value;
-                });
-                widget.onSelected?.call(value);
-              },
+              onChanged: widget.enabled
+                  ? (String? value) {
+                      setState(() {
+                        _selectedItem = value;
+                      });
+                      widget.onSelected?.call(value);
+                    }
+                  : null,
 
               buttonStyleData: const ButtonStyleData(
                 padding: EdgeInsets.only(right: 16),

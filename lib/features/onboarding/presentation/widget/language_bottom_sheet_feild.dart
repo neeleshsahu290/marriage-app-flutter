@@ -1,15 +1,17 @@
 import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
-import 'package:swan_match/features/auth/model/language_model.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/shared/widgets/my_text.dart';
 
 class LanguageBottomSheetField extends StatefulWidget {
   final String label;
-  final ValueChanged<List<Map<String, dynamic>>>? onSelected;
-  final List<Map<String, dynamic>>? initalValue;
+  final ValueChanged<List<String>>? onSelected;
+  final List<String>? initalValue;
 
   const LanguageBottomSheetField({
     super.key,
@@ -24,9 +26,9 @@ class LanguageBottomSheetField extends StatefulWidget {
 }
 
 class _LanguageBottomSheetFieldState extends State<LanguageBottomSheetField> {
-  List<Language> selectedLanguages = [];
-  List<Language> _allLanguages = [];
-  List<Language> _filteredLanguages = [];
+  List<String> selectedLanguages = [];
+  List<String> _allLanguages = [];
+  List<String> _filteredLanguages = [];
 
   bool _isLoading = true;
 
@@ -40,16 +42,16 @@ class _LanguageBottomSheetFieldState extends State<LanguageBottomSheetField> {
   Future<void> loadLanguages() async {
     try {
       final String response = await rootBundle.loadString(
-        'assets/files/languages.json',
+        'assets/files/language_name.json',
       );
 
       final List<dynamic> data = json.decode(response);
-      final list = data.map((e) => Language.fromJson(e)).toList();
+
+      /// Extract NAME only from JSON
+      final list = data.map<String>((e) => e as String).toList();
 
       if (widget.initalValue != null && widget.initalValue!.isNotEmpty) {
-        selectedLanguages = widget.initalValue!
-            .map((e) => Language.fromJson(e))
-            .toList();
+        selectedLanguages = List.from(widget.initalValue!);
       }
 
       setState(() {
@@ -57,12 +59,14 @@ class _LanguageBottomSheetFieldState extends State<LanguageBottomSheetField> {
         _filteredLanguages = list;
         _isLoading = false;
       });
-    } catch (e) {}
+    } catch (e) {
+      log("Error loading languages: $e");
+    }
   }
 
   void _openSheet(BuildContext context) {
-    List<Language> tempSelected = List.from(selectedLanguages);
-    List<Language> filtered = List.from(_filteredLanguages);
+    List<String> tempSelected = List.from(selectedLanguages);
+    List<String> filtered = List.from(_filteredLanguages);
 
     showModalBottomSheet(
       context: context,
@@ -105,18 +109,18 @@ class _LanguageBottomSheetFieldState extends State<LanguageBottomSheetField> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        MyText(text: "Languages"),
+                        MyText(text: context.tr.languages),
                         TextButton(
                           onPressed: () {
                             setState(() {
                               selectedLanguages = tempSelected;
                             });
-                            widget.onSelected?.call(
-                              selectedLanguages.map((e) => e.toJson()).toList(),
-                            );
+
+                            widget.onSelected?.call(selectedLanguages);
+
                             Navigator.pop(context);
                           },
-                          child: const Text("Done"),
+                          child: Text(context.tr.done),
                         ),
                       ],
                     ),
@@ -129,7 +133,7 @@ class _LanguageBottomSheetFieldState extends State<LanguageBottomSheetField> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: TextField(
                       decoration: InputDecoration(
-                        hintText: 'Search language',
+                        hintText: context.tr.searchLanguage,
                         prefixIcon: const Icon(Icons.search),
                         isDense: true,
                         border: OutlineInputBorder(
@@ -140,13 +144,9 @@ class _LanguageBottomSheetFieldState extends State<LanguageBottomSheetField> {
                         setModalState(() {
                           filtered = _allLanguages
                               .where(
-                                (lang) =>
-                                    lang.name.toLowerCase().contains(
-                                      value.toLowerCase(),
-                                    ) ||
-                                    lang.key.toLowerCase().contains(
-                                      value.toLowerCase(),
-                                    ),
+                                (lang) => lang.toLowerCase().contains(
+                                  value.toLowerCase(),
+                                ),
                               )
                               .toList();
                         });
@@ -162,23 +162,20 @@ class _LanguageBottomSheetFieldState extends State<LanguageBottomSheetField> {
                       itemCount: filtered.length,
                       itemBuilder: (context, index) {
                         final lang = filtered[index];
-                        final isSelected = tempSelected.any(
-                          (e) => e.key == lang.key,
-                        );
+
+                        final isSelected = tempSelected.contains(lang);
 
                         return ListTile(
                           title: MyText(
-                            text: lang.name,
+                            text: lang,
                             color: isSelected
                                 ? AppColors.primary
                                 : AppColors.textPrimary,
                           ),
-
                           trailing: isSelected
                               ? const Icon(
                                   Icons.check_circle,
                                   color: Color.fromRGBO(255, 31, 87, 0.7),
-
                                   size: 25,
                                 )
                               : const Icon(
@@ -189,9 +186,7 @@ class _LanguageBottomSheetFieldState extends State<LanguageBottomSheetField> {
                           onTap: () {
                             setModalState(() {
                               if (isSelected) {
-                                tempSelected.removeWhere(
-                                  (e) => e.key == lang.key,
-                                );
+                                tempSelected.remove(lang);
                               } else {
                                 tempSelected.add(lang);
                               }
@@ -231,8 +226,8 @@ class _LanguageBottomSheetFieldState extends State<LanguageBottomSheetField> {
                 Expanded(
                   child: MyText(
                     text: selectedLanguages.isEmpty
-                        ? "Select languages"
-                        : selectedLanguages.map((e) => e.name).join(', '),
+                        ? context.tr.selectLanguages
+                        : selectedLanguages.join(', '),
                     color: selectedLanguages.isEmpty
                         ? AppColors.textSecondary
                         : AppColors.textPrimary,

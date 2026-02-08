@@ -35,6 +35,21 @@ class SQLiteDbStorage {
     });
   }
 
+  static Future<void> clearFullDb() async {
+    try {
+      final dbPath = await getDatabasesPath();
+      final path = join(dbPath, DatabaseConfig.databaseName);
+
+      await deleteDatabase(path);
+
+      db = null; // reset reference
+
+      log("✅ Database cleared successfully");
+    } catch (e) {
+      log("❌ Error clearing DB: $e");
+    }
+  }
+
   Future<List<User>> getProfiles({required String status}) async {
     try {
       if (db == null) {

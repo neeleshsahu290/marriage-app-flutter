@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/features/setup/cubit/startup_cubit.dart';
 import 'package:swan_match/features/setup/model/welcome_intent_model.dart';
 import 'package:swan_match/shared/widgets/buttons/primarybutton.dart';
@@ -23,26 +24,26 @@ class WelcomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   MyText(
-                    text: 'Welcome  & Values',
+                    text: context.tr.welcomeTitle,
                     fontSize: 22.sp,
                     fontWeight: FontWeight.w600,
                   ),
                   SizedBox(height: 2.h),
                   MyText(
-                    text: 'Our core values',
+                    text: context.tr.welcomeSubtitle,
                     color: AppColors.textSecondary,
                   ),
                   SizedBox(height: 4.h),
                   ...List.generate(
-                    welcomeIntentList.length,
-                    (index) => valueItem(welcomeIntentList[index]),
+                    getWelcomeIntentList(context).length,
+                    (index) => valueItem(getWelcomeIntentList(context)[index]),
                   ),
                 ],
               ),
             ),
           ),
           PrimaryButton(
-            btnText: 'Continue',
+            btnText: context.tr.continueText,
             onPressed: () {
               context.read<StartupCubit>().completeWelcome();
             },

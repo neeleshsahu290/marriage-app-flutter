@@ -48,6 +48,20 @@ CREATE TABLE recommended_matches (
   phone TEXT,
   email TEXT,
 
+  latitude REAL,
+  longitude REAL,
+
+  phone_verified INTEGER,
+  email_verified INTEGER,
+
+  is_active INTEGER,
+
+  show_online_status INTEGER,
+  show_email INTEGER,
+  show_phone INTEGER,
+
+  photo_visibility TEXT,
+
   created_at TEXT,
   updated_at TEXT
 );

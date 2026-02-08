@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/router/route_names.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/features/setup/cubit/startup_cubit.dart';
 import 'package:swan_match/shared/widgets/my_text.dart';
 
@@ -49,6 +50,7 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             Container(
               decoration: BoxDecoration(
+                // ignore: deprecated_member_use
                 color: AppColors.primary.withOpacity(0.4),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -62,13 +64,13 @@ class _SplashScreenState extends State<SplashScreen> {
             SizedBox(height: 2.h),
 
             MyText(
-              text: 'Swan Match',
+              text: context.tr.appName,
               fontSize: 20.sp,
               fontWeight: FontWeight.bold,
               color: AppColors.primary,
             ),
             SizedBox(height: 2.h),
-            MyText(text: "Find your Life Partner with dignity"),
+            MyText(text: context.tr.splashTagline),
           ],
         ),
       ),

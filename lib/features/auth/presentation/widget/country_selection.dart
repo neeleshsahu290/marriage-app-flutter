@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/features/auth/model/countries_model.dart';
 import 'package:swan_match/shared/widgets/my_text.dart';
 
@@ -68,7 +69,7 @@ class _CountrySelectionState extends State<CountrySelection> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: TextField(
                       decoration: InputDecoration(
-                        hintText: 'Search country',
+                        hintText: context.tr.searchCountry,
                         prefixIcon: const Icon(Icons.search),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -131,7 +132,7 @@ class _CountrySelectionState extends State<CountrySelection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        MyText(text: 'Country'),
+        MyText(text: context.tr.countryLabel),
         const SizedBox(height: 6),
 
         GestureDetector(
@@ -159,7 +160,7 @@ class _CountrySelectionState extends State<CountrySelection> {
                     ),
                   ),
                 ] else
-                  Expanded(child: const Text("Select country")),
+                  Expanded(child: Text(context.tr.selectCountry)),
                 const Icon(Icons.keyboard_arrow_down),
               ],
             ),

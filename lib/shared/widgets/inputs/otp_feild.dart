@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/shared/widgets/my_text.dart';
 
 class DOBPickerField extends StatefulWidget {
@@ -36,14 +37,15 @@ class _DOBPickerFieldState extends State<DOBPickerField> {
         int millisec = int.parse(widget.initialDate ?? "");
         DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(millisec);
         _selectedDate = dateTime;
-      } catch (e) {}
+      } catch (e) {
+        log("Error parsing initial date: $e");
+      }
     }
 
     super.initState();
   }
 
   Future<void> _pickDate(BuildContext context) async {
-    log("hello11222");
     final now = DateTime.now();
 
     final pickedDate = await showDatePicker(
@@ -102,7 +104,7 @@ class _DOBPickerFieldState extends State<DOBPickerField> {
                 Expanded(
                   child: MyText(
                     text: _selectedDate == null
-                        ? "Select date"
+                        ? context.tr.selectDate
                         : "${_selectedDate!.day.toString().padLeft(2, '0')}/"
                               "${_selectedDate!.month.toString().padLeft(2, '0')}/"
                               "${_selectedDate!.year}",

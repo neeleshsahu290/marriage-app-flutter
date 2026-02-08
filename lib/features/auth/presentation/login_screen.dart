@@ -7,7 +7,10 @@ import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/constants/asset_constants.dart';
 import 'package:swan_match/core/router/route_names.dart';
+import 'package:swan_match/core/storage/app_prefs.dart';
+import 'package:swan_match/core/storage/pref_names.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/core/utils/validator_utils.dart';
 import 'package:swan_match/features/auth/cubit/auth_cubit.dart';
 import 'package:swan_match/features/auth/cubit/ui_cubit.dart';
@@ -63,6 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         Container(
                           decoration: BoxDecoration(
+                            // ignore: deprecated_member_use
                             color: AppColors.primary.withOpacity(0.4),
                             borderRadius: BorderRadius.circular(20),
                           ),
@@ -73,10 +77,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             width: 12.h,
                           ),
                         ),
+
                         SizedBox(height: 2.h),
 
                         MyText(
-                          text: 'Swan Match',
+                          text: context.tr.appName,
                           fontSize: 20.sp,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
@@ -89,8 +94,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             children: [
                               PrimaryTextField(
                                 controller: _controller,
-                                label: 'Email or Phone',
-                                hintText: 'Enter email or phone number',
+                                label: context.tr.emailOrPhone,
+                                hintText: context.tr.enterEmailOrPhone,
                                 onChanged: (str) {
                                   context.read<UiCubit>().setDisabled(
                                     _formKey.currentState!.validate(),
@@ -100,14 +105,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 prrefixIcon: AssetConstants.mailDarkIcon,
                                 validator: (str) {
                                   if (str == null || str.trim().isEmpty) {
-                                    return "Email or phone is required";
+                                    return context.tr.errorEmailPhoneRequired;
                                   } else if (!ValidatorUtils.isValidEmail(
                                         str.trim(),
                                       ) &&
                                       !ValidatorUtils.isValidPhone(
                                         str.trim(),
                                       )) {
-                                    return "Email or phone is required";
+                                    return context.tr.errorEmailPhoneRequired;
                                   }
                                   return null;
                                 },
@@ -116,8 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                               PrimaryTextField(
                                 controller: _passController,
-                                label: 'Password',
-                                hintText: 'Enter Password',
+                                label: context.tr.password,
+                                hintText: context.tr.enterPassword,
                                 onChanged: (str) {
                                   context.read<UiCubit>().setDisabled(
                                     _formKey.currentState!.validate(),
@@ -127,11 +132,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                 prrefixIcon: AssetConstants.mailDarkIcon,
                                 validator: (str) {
                                   if (str == null || str.trim().isEmpty) {
-                                    return "Password is required";
+                                    return context.tr.errorPasswordRequired;
                                   }
 
                                   if (str.length < 6) {
-                                    return "Password must be at least 6 characters";
+                                    return context.tr.errorPasswordLength;
                                   }
 
                                   return null;
@@ -145,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: GestureDetector(
-                            child: Text('Forgot Password?'),
+                            child: Text('${context.tr.forgotPassword}?'),
                           ),
                         ),
                         SizedBox(height: 4.h),
@@ -156,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               disablePadding: true,
                               isLoading: state.isLoading,
                               isDisabled: !state.isDisabled,
-                              btnText: 'Sign In',
+                              btnText: context.tr.signIn,
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
                                   context.read<UiCubit>().setLoading(true);
@@ -166,12 +171,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                         identifier: _controller.text,
                                         password: _passController.text,
                                       );
+
                                   context.read<UiCubit>().setLoading(false);
-
                                   if (success) {
-                                    context.read<StartupCubit>().userCreated();
-
-                                    context.go(RouteNames.home);
+                                    context.read<StartupCubit>().loggedIn();
+                                    if (AppPrefs.getBool(
+                                      PrefNames.onboardingCompleted,
+                                    )) {
+                                      context.go(RouteNames.home);
+                                    }
                                   }
                                 }
                               },
@@ -182,14 +190,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         RichText(
                           text: TextSpan(
-                            text: "Already have an account? ",
+                            text: "${context.tr.alreadyHaveAccount}? ",
                             style: const TextStyle(
                               fontSize: 16,
                               color: AppColors.textSecondary,
                             ),
                             children: [
                               TextSpan(
-                                text: "Sign in",
+                                text: context.tr.signIn,
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,

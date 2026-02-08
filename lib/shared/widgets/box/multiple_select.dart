@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/shared/widgets/my_text.dart';
 
 class MultipleSelect extends StatefulWidget {
@@ -107,7 +108,7 @@ class _MultipleSelectState extends State<MultipleSelect> {
                   horizontal: 16,
                 ),
                 child: MyText(
-                  text: widget.items[index],
+                  text: context.t(widget.items[index]),
                   color: isSelected
                       ? AppColors.textInverse
                       : AppColors.textPrimary,

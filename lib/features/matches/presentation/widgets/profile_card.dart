@@ -6,7 +6,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:swan_match/core/constants/asset_constants.dart';
 import 'package:swan_match/core/router/route_names.dart';
 import 'package:swan_match/core/theme/app_colors.dart';
+import 'package:swan_match/core/utils/extensions.dart';
 import 'package:swan_match/features/home/cubit/home_cubit.dart';
+import 'package:swan_match/features/matches/presentation/widgets/image_section_card.dart';
 import 'package:swan_match/features/matches/provider/matches_cubit.dart';
 import 'package:swan_match/match_status.dart';
 import 'package:swan_match/shared/models/user.dart';
@@ -30,11 +32,9 @@ class ProfileCard extends StatelessWidget {
       user.maritalStatus ?? "",
       user.personalityTraits.isNotEmpty ? user.personalityTraits.first : "",
 
-      // First two habits
       if (user.habits.isNotEmpty) user.habits[0],
       if (user.habits.length > 1) user.habits[1],
 
-      // First hobby
       if (user.hobbies.isNotEmpty) user.hobbies.first,
     ].where((e) => e.isNotEmpty).toList();
   }
@@ -43,30 +43,34 @@ class ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: Container(
-        // height: double.infinity,
-        margin: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: const [
-            BoxShadow(
-              blurRadius: 10,
-              color: Colors.black26,
-              offset: Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            _buildImageSection(),
+    return GestureDetector(
+      onTap: () {
+        context.push(RouteNames.matchDetails, extra: user);
+      },
+      child: SizedBox.expand(
+        child: Container(
+          margin: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.cardBackground,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [
+              BoxShadow(
+                blurRadius: 10,
+                color: Colors.black26,
+                offset: Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              ImageSectionCard(
+                imageUrl: user.profilePhotos.isNotEmpty
+                    ? user.profilePhotos.first
+                    : "",
+                status: user.photoVisibility ?? "visible_to_matches",
+              ),
 
-            GestureDetector(
-              onTap: () {
-                context.push(RouteNames.matchDetails, extra: user);
-              },
-              child: Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 12,
@@ -90,9 +94,7 @@ class ProfileCard extends StatelessWidget {
                       spacing: 8,
                       runSpacing: 6,
                       children: _buildTags()
-                          .take(
-                            cardType == CardType.recieved ? 4 : 6,
-                          ) // ~2 lines on most screens
+                          .take(cardType == CardType.recieved ? 4 : 6)
                           .map((tag) => TagChip(tag))
                           .toList(),
                     ),
@@ -100,15 +102,15 @@ class ProfileCard extends StatelessWidget {
                     SizedBox(height: 2.h),
 
                     _buildCardByType(context),
+
                     SizedBox(height: 2.h),
 
                     Align(
-                      alignment: AlignmentGeometry.center,
+                      alignment: Alignment.center,
                       child: MyText(
+                        text: context.tr.whyThisMatch,
                         textAlignment: TextAlign.center,
-                        text: 'Why this match?',
                         color: const Color.fromARGB(255, 237, 122, 151),
-
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -116,48 +118,8 @@ class ProfileCard extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ---------------- IMAGE SECTION ----------------
-
-  Widget _buildImageSection() {
-    return SizedBox(
-      height: 27.h,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            CachedNetworkImage(
-              // imageUrl: user.profilePhotos.isNotEmpty
-              //     ? user.profilePhotos.first
-              //     : "",
-              imageUrl: "https://picsum.photos/400/600",
-
-              fit: BoxFit.cover,
-
-              placeholder: (context, url) =>
-                  Container(color: Colors.grey.shade300),
-
-              errorWidget: (_, __, ___) =>
-                  const Center(child: Icon(Icons.person, size: 80)),
-            ),
-
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.transparent, Colors.black87],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -173,7 +135,7 @@ class ProfileCard extends StatelessWidget {
             Expanded(
               child: _outlineButton(
                 icon: AssetConstants.closeIcon,
-                text: 'Pass',
+                text: context.tr.pass,
                 onClick: () {
                   context.read<HomeCubit>().passRequest(user.matchId ?? "");
                 },
@@ -183,7 +145,7 @@ class ProfileCard extends StatelessWidget {
             Expanded(
               child: _outlineButton(
                 icon: AssetConstants.relationshipIcon,
-                text: 'Intrested',
+                text: context.tr.interested,
                 isDark: true,
                 onClick: () {
                   context.read<HomeCubit>().sendRequest(
@@ -204,7 +166,7 @@ class ProfileCard extends StatelessWidget {
                 Expanded(
                   child: _outlineButton(
                     icon: AssetConstants.closeIcon,
-                    text: 'Decline',
+                    text: context.tr.decline,
                     onClick: () {
                       context.read<MatchesCubit>().rejectRequest(
                         user.matchId ?? "",
@@ -216,7 +178,7 @@ class ProfileCard extends StatelessWidget {
                 Expanded(
                   child: _outlineButton(
                     icon: AssetConstants.relationshipIcon,
-                    text: 'Accept',
+                    text: context.tr.accept,
                     isDark: true,
                     onClick: () {
                       context.read<MatchesCubit>().acceptRequest(
@@ -228,10 +190,9 @@ class ProfileCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 2.h),
-
             _outlineButton(
               icon: AssetConstants.chatIcon,
-              text: 'Accept and Chat Now',
+              text: context.tr.acceptAndChat,
               onClick: () {
                 context.read<MatchesCubit>().acceptRequest(user.matchId ?? "");
               },
@@ -245,7 +206,7 @@ class ProfileCard extends StatelessWidget {
             Expanded(
               child: _outlineButton(
                 icon: AssetConstants.closeIcon,
-                text: 'Remove',
+                text: context.tr.remove,
                 onClick: () {
                   context.read<MatchesCubit>().removeRequest(
                     user.matchId ?? "",
@@ -257,7 +218,7 @@ class ProfileCard extends StatelessWidget {
             Expanded(
               child: _outlineButton(
                 icon: AssetConstants.chatIcon,
-                text: 'Chat Now',
+                text: context.tr.chatNow,
               ),
             ),
           ],
@@ -266,7 +227,7 @@ class ProfileCard extends StatelessWidget {
       case CardType.sent:
         return _outlineButton(
           icon: AssetConstants.closeIcon,
-          text: 'Revoke request from sent',
+          text: context.tr.revokeRequest,
           onClick: () {
             context.read<MatchesCubit>().cancelRequest(user.matchId ?? "");
           },
@@ -275,6 +236,7 @@ class ProfileCard extends StatelessWidget {
   }
 
   // ---------------- BUTTON ----------------
+
   Widget _outlineButton({
     required String text,
     required String icon,
@@ -293,26 +255,13 @@ class ProfileCard extends StatelessWidget {
         padding: const EdgeInsets.all(10),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.max,
         children: [
-          icon == AssetConstants.closeIcon
-              ? Padding(
-                  padding: const EdgeInsets.only(left: 4.0),
-                  child: SvgPicture.asset(
-                    icon,
-                    height: 12,
-                    width: 12,
-                    color: isDark
-                        ? AppColors.textInverse
-                        : AppColors.textPrimary,
-                  ),
-                )
-              : SvgPicture.asset(
-                  icon,
-                  height: 20,
-                  width: 20,
-                  color: isDark ? AppColors.textInverse : AppColors.textPrimary,
-                ),
+          SvgPicture.asset(
+            icon,
+            height: icon == AssetConstants.closeIcon ? 12 : 20,
+            width: icon == AssetConstants.closeIcon ? 12 : 20,
+            color: isDark ? AppColors.textInverse : AppColors.textPrimary,
+          ),
           const SizedBox(width: 6),
           Expanded(
             child: MyText(

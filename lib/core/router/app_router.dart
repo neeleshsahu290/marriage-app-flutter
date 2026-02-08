@@ -18,6 +18,7 @@ import 'package:swan_match/features/matches/provider/matches_cubit.dart';
 import 'package:swan_match/features/onboarding/cubit/onboarding_form_cubit.dart';
 import 'package:swan_match/features/onboarding/presentation/screens/intent_screen.dart';
 import 'package:swan_match/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:swan_match/features/settings/presentaton/preference_screen.dart';
 import 'package:swan_match/features/profile/presentation/profile_screen.dart';
 import 'package:swan_match/features/settings/cubit/settings_cubit.dart';
 import 'package:swan_match/features/settings/presentaton/edit_settings_screen.dart';
@@ -81,7 +82,11 @@ GoRouter router = GoRouter(
 
     GoRoute(
       path: RouteNames.language,
-      builder: (_, __) => const LanguageScreen(),
+      builder: (context, state) {
+        final bool isFromSettings = state.extra as bool? ?? false;
+
+        return LanguageScreen(isFromSettings: isFromSettings);
+      },
     ),
 
     GoRoute(
@@ -198,6 +203,14 @@ GoRouter router = GoRouter(
       builder: (context, state) => BlocProvider(
         create: (_) => getIt<SettingsCubit>(),
         child: const EditSettingsScreen(),
+      ),
+    ),
+
+    GoRoute(
+      path: RouteNames.preferenceSection,
+      builder: (context, state) => BlocProvider(
+        create: (_) => getIt<SettingsCubit>(),
+        child: const PreferencesScreen(),
       ),
     ),
   ],

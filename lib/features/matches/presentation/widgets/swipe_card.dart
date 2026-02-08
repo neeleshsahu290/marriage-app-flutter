@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SwipeCardsPage extends StatefulWidget {
+  const SwipeCardsPage({super.key});
+
   @override
   State<SwipeCardsPage> createState() => _SwipeCardsPageState();
 }

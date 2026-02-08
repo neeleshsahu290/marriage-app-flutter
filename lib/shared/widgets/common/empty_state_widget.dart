@@ -24,6 +24,7 @@ class EmptyStateWidget extends StatelessWidget {
               height: 120,
               width: 120,
               decoration: BoxDecoration(
+                // ignore: deprecated_member_use
                 color: primaryColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
